@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap';
 import { useState } from 'react';
 import { Form as BsForm } from "react-bootstrap"
 import { append, update, remove } from './listSlice';
+import ConfirmDialog from './ConfirmDialog';
 
 function Entry() {
 
@@ -22,13 +23,25 @@ function Entry() {
   let initialValues = isNew ? newGrocery() : items.find(e => e.id == id);
 
   const [ranOut, setRanOut] = useState(initialValues.ranOut);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
-  const handleDelete = () => {
-    dispatch(remove(initialValues));
-    history('/');
+  const handleDelete = () => setShowRemoveConfirm(true);
+
+  const handleConfirm = (confirmed) => {
+    if (confirmed) {
+      dispatch(remove(initialValues));
+      history('/');
+    }
+    setShowRemoveConfirm(confirmed);
   }
 
   return (<>
+
+    <ConfirmDialog title="Please confirm"
+      message={`Do you really want to delete "${initialValues?.name}"?`}
+      show={showRemoveConfirm}
+      confirm={handleConfirm} />
+
     <Formik
       initialValues={initialValues}
       validate={values => {
@@ -93,10 +106,10 @@ function Entry() {
       <h6>Status History</h6>
 
       {statusHistory[id] ? statusHistory[id].map(e =>
-      <div key={Math.random()} className="d-flex">
-        <div className='flex-grow-1'>{e.date}</div>
-        <div className='flex-grow-1'>{e.value ? 'Ran Out' : 'Have'}</div>
-      </div>) : 'Empty'
+        <div key={Math.random()} className="d-flex">
+          <div className='flex-grow-1'>{e.date}</div>
+          <div className='flex-grow-1'>{e.value ? 'Ran Out' : 'Have'}</div>
+        </div>) : 'Empty'
       }
     </div>
   </>

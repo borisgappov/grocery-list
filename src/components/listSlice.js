@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { sort } from '../shared/utils';
+import { getRandomGroceryList, sort } from '../shared/utils';
 
 const savedState = localStorage['reduxState'] && JSON.parse(localStorage['reduxState']);
 
 const initialState = savedState && savedState.list
   ? savedState.list
   : {
-    items: [],
+    items: getRandomGroceryList(25),
     filter: 0,
     history: {}
   };

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import ConfirmDialog from './ConfirmDialog';
 import ListItem from './ListItem';
 import {
   remove,
@@ -13,19 +15,29 @@ function List() {
   const items = useSelector(selectItems);
   const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
+  const [itemToRemove, setItemToRemove] = useState(null);
 
-  const handleOnRemove = (item) => {
-    dispatch(remove(item))
+  const handleConfirm = (confirmed, item) => {
+    if (confirmed) dispatch(remove(item));
+    setItemToRemove(null);
   }
 
   return (
-    <ListWrapper>
-      {
-        items
-          .filter(e => filter === 0 || (filter === 1 ? e.ranOut : !e.ranOut))
-          .map(e => <ListItem key={e.id} item={e} onRemove={handleOnRemove} />)
-      }
-    </ListWrapper>
+    <>
+
+      <ConfirmDialog title="Please confirm"
+        message={`Do you really want to delete "${itemToRemove?.name}"?`}
+        show={itemToRemove}
+        confirm={(confirmed) => handleConfirm(confirmed, itemToRemove)} />
+
+      <ListWrapper>
+        {
+          items
+            .filter(e => filter === 0 || (filter === 1 ? e.ranOut : !e.ranOut))
+            .map(e => <ListItem key={e.id} item={e} onRemove={setItemToRemove} />)
+        }
+      </ListWrapper>
+    </>
   )
 }
 
